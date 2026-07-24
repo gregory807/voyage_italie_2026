@@ -1,0 +1,2159 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Italie — Itinéraire</title>
+<meta name="theme-color" content="#F6F2E9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Prata&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F2E9; --card:#FFFDF7; --ink:#2A251E; --soft:#6E6455;
+  --sand:#E6DCC8; --line:#DCD2BE;
+  --ochre:#A9682A; --ochre-pale:#F6EBDC; --teal:#16544F; --indigo:#2F3D8C; --alert:#9B3B1F;
+  --display:'Prata',Georgia,serif; --hand:'Caveat',cursive;
+  --mono:'Fira Code',ui-monospace,Menlo,monospace;
+  --body:'Fira Code',ui-monospace,Menlo,monospace;
+  --pad:16px; --r:3px; --col:560px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);
+  font-size:13.5px;line-height:1.62;overscroll-behavior-y:none}
+.app{max-width:var(--col);margin:0 auto;padding-bottom:108px}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+a{color:inherit}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+
+/* ---------- barre du haut ---------- */
+.top{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);
+  padding:calc(env(safe-area-inset-top) + 11px) var(--pad) 0}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:10px;max-width:var(--col);margin:0 auto}
+.brand h1{font-family:var(--display);font-weight:400;font-size:19px;margin:0}
+.brand h1 span{color:var(--ochre)}
+.sync{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--soft);display:flex;align-items:center;gap:6px;white-space:nowrap;padding:4px 0}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--soft);flex:none}
+.sync.ok .dot{background:var(--teal)}
+.sync.off .dot{background:var(--ochre)}
+.sync.load .dot{background:var(--indigo);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.25}}
+
+/* ---------- pastilles de jours ---------- */
+.navjours{display:flex;align-items:center;gap:4px;max-width:var(--col);margin:0 auto;padding:9px 0 9px}
+.fleche{flex:none;width:26px;height:34px;display:grid;place-items:center;color:var(--soft);
+  border:1px solid var(--line);border-radius:var(--r);background:var(--card)}
+.fleche[disabled]{opacity:.3}
+.fleche svg{width:13px;height:13px}
+.days{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x proximity;flex:1;
+  scrollbar-width:none;-ms-overflow-style:none}
+.days::-webkit-scrollbar{display:none}
+.chip{flex:none;scroll-snap-align:center;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--card);padding:5px 9px 6px;text-align:left}
+.chip b{display:block;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.04em}
+.chip i{display:block;font-style:normal;font-size:9.5px;color:var(--soft);white-space:nowrap;margin-top:1px}
+.chip.on{background:var(--teal);border-color:var(--teal);color:#FBF8F0}
+.chip.on i{color:rgba(251,248,240,.72)}
+.chip.today:not(.on){border-color:var(--ochre)}
+
+/* ---------- photo + entête ---------- */
+.hero{position:relative;height:172px;overflow:hidden;background:var(--sand)}
+.hero img{width:100%;height:100%;object-fit:cover;display:block}
+.hero::after{content:'';position:absolute;inset:auto 0 0;height:58px;
+  background:linear-gradient(to bottom,rgba(246,242,233,0),var(--paper))}
+.dayhead{position:relative;display:flex;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r);margin:-50px 14px 0;z-index:2;box-shadow:0 2px 14px rgba(42,37,30,.07)}
+.dayhead.nohero{margin-top:14px}
+.numcol{flex:none;width:66px;padding:16px 0 16px;text-align:center;border-right:1px solid var(--line)}
+.numcol .n{font-family:var(--display);font-size:40px;line-height:1;color:var(--ochre)}
+.numcol .l{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--soft);
+  text-transform:uppercase;margin-top:3px}
+.txtcol{flex:1;min-width:0;padding:15px 15px 15px 16px}
+.quand{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--soft)}
+.quand b{color:var(--ochre);font-weight:500}
+.dayhead h2{font-family:var(--display);font-weight:400;font-size:20px;margin:5px 0 0;line-height:1.22}
+.dayhead .sous{font-family:var(--hand);font-size:18px;color:var(--teal);margin:1px 0 0;line-height:1.25}
+.trajet{margin-top:11px;padding-top:9px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:11px;color:var(--teal);line-height:1.5}
+.trajet em{font-style:normal;color:var(--soft)}
+
+/* ---------- ancrages ---------- */
+.ancres{margin:12px 14px 0;padding:9px 12px;background:var(--ochre-pale);
+  border-left:3px solid var(--ochre);border-radius:0;font-family:var(--mono);font-size:11px;
+  color:#6B4517;line-height:1.7}
+.ancres b{display:block;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ochre);margin-bottom:2px;font-weight:500}
+.suivant{margin:12px 14px 0;padding:10px 12px;background:var(--teal);color:#FBF8F0;border-radius:var(--r)}
+.suivant b{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;
+  text-transform:uppercase;opacity:.72;margin-bottom:2px;font-weight:500}
+
+/* ---------- sections ---------- */
+.sect{padding:18px var(--pad) 0}
+.sect h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--soft);margin:0 0 10px;font-weight:500;display:flex;align-items:center;gap:9px}
+.sect h3::after{content:'';flex:1;height:1px;background:var(--line)}
+.sect h3 .cpt{color:var(--ochre);letter-spacing:.05em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 13px}
+.empty{font-size:12.5px;color:var(--soft);font-style:italic;margin:0}
+
+/* ---------- le rail ---------- */
+.rail{position:relative;margin:0;padding:0;list-style:none}
+.rail::before{content:'';position:absolute;left:6px;top:12px;bottom:14px;width:1px;background:var(--line)}
+.step{position:relative;padding:0 0 15px 30px}
+.mark{position:absolute;left:0;top:5px;width:13px;height:13px;display:grid;place-items:center}
+.mark i{display:block;width:9px;height:9px;border-radius:50%;background:var(--paper);
+  border:1.5px solid var(--teal);box-sizing:border-box}
+.step.transport .mark i{border-radius:1px;background:var(--teal)}
+.step.option .mark i{border-color:var(--soft);border-style:dashed}
+.step.fige{background:var(--ochre-pale);margin-left:-8px;padding-left:38px;padding-top:6px;
+  padding-bottom:8px;margin-bottom:9px;border-radius:var(--r)}
+.step.fige .mark{left:8px;top:11px}
+.step.fige .mark i{background:var(--ochre);border-color:var(--ochre)}
+.heure{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:500;
+  letter-spacing:.04em;background:var(--ochre);color:#FBF8F0;padding:2px 7px;border-radius:2px;
+  margin-bottom:4px}
+.heure.libre{background:none;color:var(--indigo);padding:0}
+.step .t{font-size:13.5px;line-height:1.45}
+.step .d{font-size:12.5px;color:var(--soft);margin-top:3px;line-height:1.45}
+.step.option .t{color:var(--soft)}
+.maps{display:inline-flex;align-items:center;gap:5px;margin-top:7px;font-family:var(--mono);
+  font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--teal);
+  border:1px solid var(--line);background:var(--card);padding:5px 9px;border-radius:var(--r);
+  text-decoration:none}
+.maps:active{background:var(--sand)}
+.maps svg{width:11px;height:11px;flex:none}
+
+/* ---------- rangées ---------- */
+.row{display:flex;gap:11px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.row:last-child{border-bottom:0}
+.row .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--soft);flex:none;width:92px;padding-top:2px}
+.row .v{flex:1;min-width:0;word-break:break-word}
+.row .v em{font-style:normal;color:var(--soft);font-family:var(--mono);font-size:11.5px}
+
+/* ---------- décisions ---------- */
+.opt{display:flex;gap:11px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--card);padding:11px 12px;margin-bottom:8px}
+.opt.choisi{border-color:var(--teal);border-left:3px solid var(--teal);background:#F4F8F6}
+.opt.ecarte .corps{opacity:.55}
+.vign{flex:none;width:56px;height:56px;border-radius:2px;object-fit:cover;background:var(--sand)}
+.corps{flex:1;min-width:0}
+.etat{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--teal);display:block;margin-bottom:3px}
+.etat.gris{color:var(--soft)}
+.opt h4{margin:0;font-family:var(--display);font-size:15.5px;font-weight:400;line-height:1.25}
+.opt p{margin:3px 0 0;font-size:12px;color:var(--soft);line-height:1.45}
+.actes{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.bt{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;
+  border:1px solid var(--line);background:var(--paper);padding:6px 9px;border-radius:var(--r);color:var(--soft)}
+.bt.oui{border-color:var(--teal);color:var(--teal)}
+.bt:active{background:var(--sand)}
+
+/* ---------- alertes ---------- */
+.alerte{border-left:3px solid var(--alert);background:#FCF4EF;padding:11px 13px;
+  border-radius:0;margin-bottom:8px}
+.alerte b{display:block;font-size:13px;color:#7A2E15;margin-bottom:3px}
+.alerte p{margin:0;font-size:12.5px;color:#5A3325;line-height:1.5}
+
+/* ---------- cases ---------- */
+.check{display:flex;gap:10px;align-items:flex-start;padding:9px 0;
+  border-bottom:1px solid var(--line);width:100%;text-align:left}
+.check:last-child{border-bottom:0}
+.boite{flex:none;width:17px;height:17px;border:1.5px solid var(--teal);border-radius:2px;
+  margin-top:1px;display:grid;place-items:center;background:var(--card)}
+.boite svg{width:11px;height:11px;opacity:0}
+.check.done .boite{background:var(--teal)}
+.check.done .boite svg{opacity:1}
+.check.done .lbl{color:var(--soft);text-decoration:line-through;text-decoration-thickness:1px}
+.lbl{flex:1;font-size:13px;line-height:1.45}
+.qui{font-family:var(--mono);font-size:10px;color:var(--indigo);letter-spacing:.04em;
+  margin-top:2px;display:block}
+.cat{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--indigo);padding:12px 0 3px}
+
+/* ---------- boutons pleine largeur ---------- */
+.big{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:12px 13px;margin-bottom:8px;text-decoration:none;font-size:13.5px;text-align:left}
+.big span.m{font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--soft);white-space:nowrap}
+.big:active{background:var(--sand)}
+
+/* ---------- navigation bas de page ---------- */
+.pied{display:flex;gap:8px;padding:22px var(--pad) 0}
+.pied button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:var(--r);
+  padding:11px 10px;font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--soft)}
+.pied button[disabled]{opacity:.35}
+.pied button b{display:block;font-weight:500;color:var(--ink);font-size:12px;margin-top:2px}
+.citation{padding:26px var(--pad) 6px;text-align:center}
+.citation p{font-family:var(--hand);font-size:17px;color:var(--soft);margin:0;line-height:1.35}
+.imgbas{display:block;width:calc(100% - 32px);margin:18px auto 0;border-radius:var(--r);
+  border:1px solid var(--line)}
+
+/* ---------- barre du bas ---------- */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);
+  border-top:1px solid var(--line);box-shadow:0 -2px 12px rgba(42,37,30,.06);
+  padding-bottom:env(safe-area-inset-bottom)}
+.tabsin{display:flex;max-width:var(--col);margin:0 auto}
+.tab{flex:1;padding:9px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--soft);border-top:2px solid transparent}
+.tab svg{width:19px;height:19px}
+.tab.on{color:var(--teal);border-top-color:var(--teal)}
+
+/* ---------- écrans superposés ---------- */
+.voile{position:fixed;inset:0;z-index:50;background:rgba(42,37,30,.42);
+  display:flex;align-items:flex-end;justify-content:center}
+.feuille{background:var(--paper);width:100%;max-width:var(--col);max-height:90vh;overflow-y:auto;
+  border-radius:10px 10px 0 0;padding:0 0 calc(env(safe-area-inset-bottom) + 22px)}
+.feuille header{position:sticky;top:0;background:var(--paper);display:flex;align-items:center;
+  justify-content:space-between;padding:15px var(--pad) 11px;border-bottom:1px solid var(--line)}
+.feuille header h2{font-family:var(--display);font-weight:400;font-size:18px;margin:0}
+.feuille .x{font-family:var(--mono);font-size:11px;color:var(--soft);letter-spacing:.05em}
+.champ{width:100%;font:inherit;font-size:12px;padding:10px 11px;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--card);color:var(--ink)}
+.aide{font-size:11.5px;color:var(--soft);margin:6px 0 14px;line-height:1.5}
+.intro p{font-size:13.5px;line-height:1.65;margin:0 0 12px}
+.intro strong{color:var(--ochre);font-weight:500}
+
+/* ---------- composeur et notes ---------- */
+.note{display:flex;gap:11px;padding:9px 0;border-bottom:1px solid var(--line)}
+.note:last-of-type{border-bottom:0}
+.note .meta{flex:none;width:92px}
+.note .meta b{display:block;font-family:var(--mono);font-size:10.5px;color:var(--ochre);
+  letter-spacing:.05em;font-weight:500;text-transform:uppercase}
+.note .meta em{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--soft)}
+.note .txt{flex:1;font-size:13px;line-height:1.5}
+.compo{display:flex;gap:7px;margin-top:11px}
+.compo textarea{flex:1;font:inherit;font-size:12.5px;padding:9px 10px;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--paper);color:var(--ink);resize:vertical;min-height:44px}
+
+#toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%) translateY(14px);z-index:60;
+  background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:11px;
+  padding:10px 15px;border-radius:var(--r);opacity:0;pointer-events:none;
+  transition:opacity .2s,transform .2s;max-width:86vw;text-align:center;line-height:1.45}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <h1>Italie<span>.</span></h1>
+      <button class="sync" id="sync"><span class="dot"></span><span id="syncTxt">Local</span></button>
+    </div>
+    <nav class="navjours" id="navjours"></nav>
+  </header>
+  <main id="vue"></main>
+</div>
+
+<nav class="tabs"><div class="tabsin">
+  <button class="tab on" data-tab="jour">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>Itinéraire</button>
+  <button class="tab" data-tab="infos">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></svg>Infos</button>
+  <button class="tab" data-tab="prep">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 11l2.5 2.5L16 8"/><rect x="4" y="4" width="16" height="16" rx="2"/></svg>Prépa</button>
+</div></nav>
+
+<script>
+const SEED = {
+ "config": {
+  "titre": "Italie — Itinéraire",
+  "sous_titre": "Milan · Cinque Terre · Toscane · Côte Amalfitaine",
+  "date_jour_1": "",
+  "nb_voyageurs": "9 — six adultes et trois enfants (6, 3 et 3 ans)",
+  "devise": "EUR",
+  "lien_splitwise": "",
+  "lien_photos": "",
+  "lien_sheet": "",
+  "citation": "Les lieux s'oublient parfois, mais les émotions d'un voyage restent gravées à jamais.",
+  "fuseau": "Europe/Rome"
+ },
+ "jours": [
+  {
+   "jour": 1,
+   "titre": "Arrivée à Milan",
+   "sous_titre": "",
+   "ville": "Milan",
+   "etape": "YUL → Milan",
+   "route": "",
+   "hebergement": "Airbnb Milan",
+   "adresse": "Via Edmondo de Amicis, 59, Milan",
+   "reservation": "",
+   "image": "jour-01.webp",
+   "imageBas": "extra-carte-milan.webp"
+  },
+  {
+   "jour": 2,
+   "titre": "Visite de Milan",
+   "sous_titre": "",
+   "ville": "Milan",
+   "etape": "",
+   "route": "",
+   "hebergement": "Airbnb Milan",
+   "adresse": "Via Edmondo de Amicis, 59, Milan",
+   "reservation": "",
+   "image": "jour-02.webp",
+   "imageBas": "extra-navigli.webp"
+  },
+  {
+   "jour": 3,
+   "titre": "Lac de Côme",
+   "sous_titre": "avec ou sans Bellagio",
+   "ville": "Varenna",
+   "etape": "Milan → Varenna · train",
+   "route": "1 h 10",
+   "hebergement": "Airbnb Milan",
+   "adresse": "Via Edmondo de Amicis, 59, Milan",
+   "reservation": "",
+   "image": "jour-03.webp",
+   "imageBas": "extra-varenna-plage.webp"
+  },
+  {
+   "jour": 4,
+   "titre": "Vers La Spezia",
+   "sous_titre": "Riomaggiore en fin de journée",
+   "ville": "La Spezia",
+   "etape": "Milan → La Spezia · train",
+   "route": "3 h 00",
+   "hebergement": "Airbnb La Spezia",
+   "adresse": "Via Lazzaro Spallanzani, 13, 19122 La Spezia SP, Italie",
+   "reservation": "",
+   "image": "jour-04.webp",
+   "imageBas": ""
+  },
+  {
+   "jour": 5,
+   "titre": "Cinque Terre",
+   "sous_titre": "Vernazza puis Monterosso",
+   "ville": "Cinque Terre",
+   "etape": "",
+   "route": "",
+   "hebergement": "Airbnb La Spezia",
+   "adresse": "Via Lazzaro Spallanzani, 13, 19122 La Spezia SP, Italie",
+   "reservation": "",
+   "image": "jour-05.webp",
+   "imageBas": "extra-monterosso.webp"
+  },
+  {
+   "jour": 6,
+   "titre": "Vers la Toscane",
+   "sous_titre": "",
+   "ville": "Sienne",
+   "etape": "La Spezia → Sienne · auto",
+   "route": "2 h 45",
+   "hebergement": "Villa Toscane",
+   "adresse": "Strada di Larniano 45, Siena, Tuscany, 53100 Italy",
+   "reservation": "",
+   "image": "jour-06.webp",
+   "imageBas": "extra-toscane-village.webp"
+  },
+  {
+   "jour": 7,
+   "titre": "En Toscane",
+   "sous_titre": "la journée se bâtit le matin",
+   "ville": "Sienne",
+   "etape": "",
+   "route": "",
+   "hebergement": "Villa Toscane",
+   "adresse": "Strada di Larniano 45, Siena, Tuscany, 53100 Italy",
+   "reservation": "",
+   "image": "jour-07.webp",
+   "imageBas": ""
+  },
+  {
+   "jour": 8,
+   "titre": "Encore la Toscane",
+   "sous_titre": "dernière journée avant la côte",
+   "ville": "Sienne",
+   "etape": "",
+   "route": "",
+   "hebergement": "Villa Toscane",
+   "adresse": "Strada di Larniano 45, Siena, Tuscany, 53100 Italy",
+   "reservation": "",
+   "image": "jour-08.webp",
+   "imageBas": ""
+  },
+  {
+   "jour": 9,
+   "titre": "Vers Sant'Agata",
+   "sous_titre": "",
+   "ville": "Sant'Agata",
+   "etape": "Sienne → Sant'Agata · auto",
+   "route": "4 h 30",
+   "hebergement": "Airbnb Sant'Agata",
+   "adresse": "Via Pontone, 10, Sant'Agata sui Due Golfi, Campania 80061",
+   "reservation": "",
+   "image": "jour-09.webp",
+   "imageBas": "extra-bolsena.webp"
+  },
+  {
+   "jour": 10,
+   "titre": "Positano",
+   "sous_titre": "",
+   "ville": "Positano",
+   "etape": "Sant'Agata → Sorrento · auto, puis ferry",
+   "route": "30 min",
+   "hebergement": "Airbnb Sant'Agata",
+   "adresse": "Via Pontone, 10, Sant'Agata sui Due Golfi, Campania 80061",
+   "reservation": "",
+   "image": "jour-10.webp",
+   "imageBas": ""
+  },
+  {
+   "jour": 11,
+   "titre": "Excursion en bateau",
+   "sous_titre": "la côte amalfitaine vue de la mer",
+   "ville": "Sorrento",
+   "etape": "",
+   "route": "",
+   "hebergement": "Airbnb Sant'Agata",
+   "adresse": "Via Pontone, 10, Sant'Agata sui Due Golfi, Campania 80061",
+   "reservation": "",
+   "image": "jour-11.webp",
+   "imageBas": "extra-amalfi.webp"
+  },
+  {
+   "jour": 12,
+   "titre": "Capri ou Sorrento",
+   "sous_titre": "au choix",
+   "ville": "Capri / Sorrento",
+   "etape": "",
+   "route": "",
+   "hebergement": "Airbnb Sant'Agata",
+   "adresse": "Via Pontone, 10, Sant'Agata sui Due Golfi, Campania 80061",
+   "reservation": "",
+   "image": "jour-12.webp",
+   "imageBas": "extra-regina-giovanna.webp"
+  },
+  {
+   "jour": 13,
+   "titre": "Retour à Montréal",
+   "sous_titre": "",
+   "ville": "Naples",
+   "etape": "Sant'Agata → Naples · auto",
+   "route": "1 h 15",
+   "hebergement": "",
+   "adresse": "",
+   "reservation": "",
+   "image": "jour-13.webp",
+   "imageBas": ""
+  }
+ ],
+ "activites": [
+  {
+   "jour": 1,
+   "ordre": 1,
+   "heure": "",
+   "type": "transport",
+   "titre": "Arrivée à Milan, taxi vers le Airbnb",
+   "details": "Arrivée autonome au Airbnb. Dépôt des bagages possible dès 10 h 30.",
+   "lieu": "Via Edmondo de Amicis 59, Milano",
+   "fixe": "NON"
+  },
+  {
+   "jour": 1,
+   "ordre": 2,
+   "heure": "",
+   "type": "logistique",
+   "titre": "Installation et épicerie au besoin",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 1,
+   "ordre": 3,
+   "heure": "",
+   "type": "repos",
+   "titre": "Repos au logement",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 1,
+   "ordre": 4,
+   "heure": "",
+   "type": "repas",
+   "titre": "Souper dans les alentours ou vers Navigli",
+   "details": "",
+   "lieu": "Navigli, Milano",
+   "fixe": "NON"
+  },
+  {
+   "jour": 2,
+   "ordre": 1,
+   "heure": "",
+   "type": "repas",
+   "titre": "Déjeuner dans les alentours",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 2,
+   "ordre": 2,
+   "heure": "",
+   "type": "visite",
+   "titre": "Duomo de Milan",
+   "details": "",
+   "lieu": "Duomo di Milano",
+   "fixe": "NON"
+  },
+  {
+   "jour": 2,
+   "ordre": 3,
+   "heure": "",
+   "type": "visite",
+   "titre": "Galleria Vittorio Emanuele II",
+   "details": "",
+   "lieu": "Galleria Vittorio Emanuele II, Milano",
+   "fixe": "NON"
+  },
+  {
+   "jour": 2,
+   "ordre": 4,
+   "heure": "",
+   "type": "visite",
+   "titre": "Piazza della Scala",
+   "details": "",
+   "lieu": "Piazza della Scala, Milano",
+   "fixe": "NON"
+  },
+  {
+   "jour": 2,
+   "ordre": 6,
+   "heure": "",
+   "type": "plage",
+   "titre": "Pour se rafraîchir : Bagni Misteriosi",
+   "details": "Piscine extérieure historique.",
+   "lieu": "Bagni Misteriosi, Milano",
+   "fixe": "NON"
+  },
+  {
+   "jour": 2,
+   "ordre": 7,
+   "heure": "",
+   "type": "repas",
+   "titre": "Soirée Navigli",
+   "details": "",
+   "lieu": "Navigli, Milano",
+   "fixe": "NON"
+  },
+  {
+   "jour": 3,
+   "ordre": 1,
+   "heure": "",
+   "type": "repas",
+   "titre": "Déjeuner tôt",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 3,
+   "ordre": 2,
+   "heure": "",
+   "type": "transport",
+   "titre": "Train vers Varenna-Esino",
+   "details": "Durée : 1 h 00 à 1 h 10. Billets commandés la veille.",
+   "lieu": "Varenna-Esino railway station",
+   "fixe": "OUI"
+  },
+  {
+   "jour": 3,
+   "ordre": 3,
+   "heure": "",
+   "type": "visite",
+   "titre": "Marché vers le centre",
+   "details": "",
+   "lieu": "Varenna, Lecco",
+   "fixe": "NON"
+  },
+  {
+   "jour": 3,
+   "ordre": 4,
+   "heure": "",
+   "type": "visite",
+   "titre": "Visite de Varenna",
+   "details": "",
+   "lieu": "Varenna, Lecco",
+   "fixe": "NON"
+  },
+  {
+   "jour": 4,
+   "ordre": 1,
+   "heure": "",
+   "type": "repas",
+   "titre": "Déjeuner et ramasser quelque chose pour le train",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 4,
+   "ordre": 2,
+   "heure": "11 h 05",
+   "type": "transport",
+   "titre": "Train vers La Spezia",
+   "details": "",
+   "lieu": "La Spezia Centrale",
+   "fixe": "OUI"
+  },
+  {
+   "jour": 4,
+   "ordre": 3,
+   "heure": "",
+   "type": "logistique",
+   "titre": "6 minutes de marche vers le Airbnb",
+   "details": "",
+   "lieu": "Via Lazzaro Spallanzani 13, 19122 La Spezia SP",
+   "fixe": "NON"
+  },
+  {
+   "jour": 4,
+   "ordre": 4,
+   "heure": "",
+   "type": "repos",
+   "titre": "Repos au Airbnb, repas dans les environs",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 4,
+   "ordre": 5,
+   "heure": "",
+   "type": "visite",
+   "titre": "Départ vers Riomaggiore",
+   "details": "Port, ruelles, coucher du soleil, baignade possible.",
+   "lieu": "Riomaggiore, La Spezia",
+   "fixe": "NON"
+  },
+  {
+   "jour": 5,
+   "ordre": 1,
+   "heure": "",
+   "type": "visite",
+   "titre": "Visite de Vernazza",
+   "details": "",
+   "lieu": "Vernazza, La Spezia",
+   "fixe": "NON"
+  },
+  {
+   "jour": 5,
+   "ordre": 2,
+   "heure": "PM",
+   "type": "transport",
+   "titre": "Train vers Monterosso",
+   "details": "",
+   "lieu": "Monterosso al Mare",
+   "fixe": "OUI"
+  },
+  {
+   "jour": 5,
+   "ordre": 3,
+   "heure": "",
+   "type": "plage",
+   "titre": "Plage Fegina",
+   "details": "Transats disponibles.",
+   "lieu": "Spiaggia di Fegina, Monterosso al Mare",
+   "fixe": "NON"
+  },
+  {
+   "jour": 5,
+   "ordre": 4,
+   "heure": "",
+   "type": "logistique",
+   "titre": "Retour au logement (bagages)",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 5,
+   "ordre": 5,
+   "heure": "",
+   "type": "repas",
+   "titre": "Soirée dans une ville des Cinque Terre",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 6,
+   "ordre": 1,
+   "heure": "",
+   "type": "logistique",
+   "titre": "Déjeuner et check-out",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 6,
+   "ordre": 2,
+   "heure": "10 h 00",
+   "type": "transport",
+   "titre": "Prise de la voiture chez Enterprise",
+   "details": "",
+   "lieu": "Enterprise Rent-A-Car La Spezia",
+   "fixe": "OUI"
+  },
+  {
+   "jour": 6,
+   "ordre": 3,
+   "heure": "13 h 00 – 14 h 00",
+   "type": "logement",
+   "titre": "Arrivée à la villa",
+   "details": "",
+   "lieu": "Strada di Larniano 45, Siena, Tuscany, 53100",
+   "fixe": "OUI"
+  },
+  {
+   "jour": 6,
+   "ordre": 4,
+   "heure": "",
+   "type": "logistique",
+   "titre": "Épicerie",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 6,
+   "ordre": 5,
+   "heure": "",
+   "type": "plage",
+   "titre": "Piscine",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 6,
+   "ordre": 6,
+   "heure": "",
+   "type": "repas",
+   "titre": "Souper tranquille à la villa",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 7,
+   "ordre": 1,
+   "heure": "",
+   "type": "repas",
+   "titre": "Déjeuner à la villa",
+   "details": "La journée se bâtit à partir du menu toscan.",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 8,
+   "ordre": 1,
+   "heure": "",
+   "type": "repas",
+   "titre": "Déjeuner à la villa",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 8,
+   "ordre": 2,
+   "heure": "",
+   "type": "logistique",
+   "titre": "Préparer les bagages",
+   "details": "Départ à 6 h 30 demain matin.",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 9,
+   "ordre": 1,
+   "heure": "6 h 30",
+   "type": "transport",
+   "titre": "Départ de la Toscane",
+   "details": "",
+   "lieu": "",
+   "fixe": "OUI"
+  },
+  {
+   "jour": 9,
+   "ordre": 2,
+   "heure": "",
+   "type": "option",
+   "titre": "Arrêt recommandé : Lac Bolsena ou Pienza",
+   "details": "",
+   "lieu": "Lago di Bolsena",
+   "fixe": "NON"
+  },
+  {
+   "jour": 9,
+   "ordre": 3,
+   "heure": "",
+   "type": "repas",
+   "titre": "Pause lunch",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 9,
+   "ordre": 4,
+   "heure": "",
+   "type": "logement",
+   "titre": "Arrivée au Airbnb",
+   "details": "",
+   "lieu": "Via Pontone 10, Sant'Agata sui Due Golfi, Campania 80061",
+   "fixe": "NON"
+  },
+  {
+   "jour": 9,
+   "ordre": 5,
+   "heure": "",
+   "type": "logistique",
+   "titre": "Épicerie",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 9,
+   "ordre": 6,
+   "heure": "",
+   "type": "repos",
+   "titre": "Profiter de la vue et relaxer",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 10,
+   "ordre": 1,
+   "heure": "",
+   "type": "transport",
+   "titre": "Départ vers Sorrento en auto",
+   "details": "",
+   "lieu": "Sorrento, Naples",
+   "fixe": "NON"
+  },
+  {
+   "jour": 10,
+   "ordre": 2,
+   "heure": "",
+   "type": "transport",
+   "titre": "Ferry Sorrento – Positano",
+   "details": "",
+   "lieu": "Sorrento ferry port",
+   "fixe": "NON"
+  },
+  {
+   "jour": 10,
+   "ordre": 3,
+   "heure": "",
+   "type": "visite",
+   "titre": "Marcher dans les ruelles et flâner",
+   "details": "C'est là que réside le charme de Positano.",
+   "lieu": "Positano, Salerno",
+   "fixe": "NON"
+  },
+  {
+   "jour": 10,
+   "ordre": 4,
+   "heure": "",
+   "type": "visite",
+   "titre": "Point de vue : Via Cristoforo Colombo",
+   "details": "",
+   "lieu": "Via Cristoforo Colombo, Positano",
+   "fixe": "NON"
+  },
+  {
+   "jour": 10,
+   "ordre": 5,
+   "heure": "",
+   "type": "plage",
+   "titre": "Plage : Spiaggia Grande, ou piscine du Airbnb",
+   "details": "",
+   "lieu": "Spiaggia Grande, Positano",
+   "fixe": "NON"
+  },
+  {
+   "jour": 11,
+   "ordre": 1,
+   "heure": "8 h 15",
+   "type": "transport",
+   "titre": "Point de départ de l'excursion",
+   "details": "Parcheggio Comunale Achille Lauro.",
+   "lieu": "Via Correale, 80067 Sorrento NA",
+   "fixe": "OUI"
+  },
+  {
+   "jour": 11,
+   "ordre": 2,
+   "heure": "",
+   "type": "visite",
+   "titre": "Visite des côtes amalfitaines en bateau",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 12,
+   "ordre": 1,
+   "heure": "",
+   "type": "plage",
+   "titre": "Bassin naturel Bagni Regina Giovanna",
+   "details": "Vero le recommande fortement.",
+   "lieu": "Bagni della Regina Giovanna, Sorrento",
+   "fixe": "NON"
+  },
+  {
+   "jour": 12,
+   "ordre": 2,
+   "heure": "",
+   "type": "logistique",
+   "titre": "Retour au Airbnb — préparer les bagages",
+   "details": "",
+   "lieu": "",
+   "fixe": "NON"
+  },
+  {
+   "jour": 13,
+   "ordre": 1,
+   "heure": "6 h 00",
+   "type": "transport",
+   "titre": "Départ vers Naples en voiture",
+   "details": "",
+   "lieu": "Naples International Airport",
+   "fixe": "OUI"
+  },
+  {
+   "jour": 13,
+   "ordre": 2,
+   "heure": "",
+   "type": "logistique",
+   "titre": "Dépôt de la voiture chez Enterprise",
+   "details": "",
+   "lieu": "Enterprise Naples Airport",
+   "fixe": "NON"
+  },
+  {
+   "jour": 13,
+   "ordre": 3,
+   "heure": "11 h 35",
+   "type": "transport",
+   "titre": "Vol de retour",
+   "details": "",
+   "lieu": "",
+   "fixe": "OUI"
+  }
+ ],
+ "options": [
+  {
+   "id": "MIL-1",
+   "groupe": "Après-midi à Milan",
+   "jours": "2",
+   "titre": "Quartier Brera",
+   "resume": "Ruelles, galeries, terrasses.",
+   "details": "",
+   "lieu": "Brera, Milano",
+   "image": "",
+   "choix": "",
+   "par": ""
+  },
+  {
+   "id": "MIL-2",
+   "groupe": "Après-midi à Milan",
+   "jours": "2",
+   "titre": "Parco Sempione",
+   "resume": "Grand parc, de l'ombre, l'Arco della Pace.",
+   "details": "",
+   "lieu": "Parco Sempione, Milano",
+   "image": "",
+   "choix": "",
+   "par": ""
+  },
+  {
+   "id": "COME-1",
+   "groupe": "Lac de Côme",
+   "jours": "3",
+   "titre": "Bellagio",
+   "resume": "Traversier depuis Varenna, puis le Lido.",
+   "details": "Traversier Varenna → Bellagio, puis baignade au Lido.",
+   "lieu": "Lido di Bellagio",
+   "image": "opt-bellagio.webp",
+   "choix": "",
+   "par": ""
+  },
+  {
+   "id": "COME-2",
+   "groupe": "Lac de Côme",
+   "jours": "3",
+   "titre": "Lidi Lierna",
+   "resume": "Le plan B si Bellagio est bondé.",
+   "details": "Taxi jusqu'à Lierna.",
+   "lieu": "Lierna, Lecco",
+   "image": "",
+   "choix": "",
+   "par": ""
+  },
+  {
+   "id": "TOSC-1",
+   "groupe": "Toscane — le menu",
+   "jours": "6,7,8",
+   "titre": "Sienne",
+   "resume": "Piazza del Campo et la cathédrale.",
+   "details": "Stationnement : Parcheggio Il Campo. Piazza del Campo, cathédrale, Via di Città.",
+   "lieu": "Piazza del Campo, Siena",
+   "image": "opt-sienne.webp",
+   "choix": "",
+   "par": ""
+  },
+  {
+   "id": "TOSC-2",
+   "groupe": "Toscane — le menu",
+   "jours": "6,7,8",
+   "titre": "San Gimignano",
+   "resume": "Les tours médiévales, en demi-journée.",
+   "details": "Piazza della Cisterna, les ruelles, lunch sur place.",
+   "lieu": "Piazza della Cisterna, San Gimignano",
+   "image": "opt-sangimignano.webp",
+   "choix": "",
+   "par": ""
+  },
+  {
+   "id": "TOSC-3",
+   "groupe": "Toscane — le menu",
+   "jours": "6,7,8",
+   "titre": "Val d'Orcia",
+   "resume": "Pienza et les routes de carte postale.",
+   "details": "Pienza, Piazza Pio II, lunch dans le Val d'Orcia.",
+   "lieu": "Pienza, Siena",
+   "image": "opt-valdorcia.webp",
+   "choix": "",
+   "par": ""
+  },
+  {
+   "id": "TOSC-4",
+   "groupe": "Toscane — le menu",
+   "jours": "6,7,8",
+   "titre": "Vignoble en soirée",
+   "resume": "Castello di Meleto. À réserver d'avance.",
+   "details": "",
+   "lieu": "Castello di Meleto, Gaiole in Chianti",
+   "image": "",
+   "choix": "",
+   "par": ""
+  },
+  {
+   "id": "TOSC-5",
+   "groupe": "Toscane — le menu",
+   "jours": "6,7,8",
+   "titre": "Villa et piscine",
+   "resume": "La journée molle, assumée.",
+   "details": "",
+   "lieu": "",
+   "image": "",
+   "choix": "",
+   "par": ""
+  },
+  {
+   "id": "AMAL-1",
+   "groupe": "Dernière journée",
+   "jours": "12",
+   "titre": "Capri",
+   "resume": "Ferry, funiculaire, marché, plage.",
+   "details": "Ferry depuis Sorrento, funiculaire vers Capri, marché puis plage.",
+   "lieu": "Capri, Naples",
+   "image": "opt-capri.webp",
+   "choix": "",
+   "par": ""
+  },
+  {
+   "id": "AMAL-2",
+   "groupe": "Dernière journée",
+   "jours": "12",
+   "titre": "Relax à Sorrento",
+   "resume": "Piazza Tasso, Villa Comunale, Marina Grande.",
+   "details": "",
+   "lieu": "Piazza Tasso, Sorrento",
+   "image": "opt-sorrento.webp",
+   "choix": "",
+   "par": ""
+  }
+ ],
+ "vols": [
+  {
+   "foyer": "Greg et Jo-Annie",
+   "sens": "Aller",
+   "personnes": "Greg, Jo-Annie, Liam (6 ans), Miko (3 ans)",
+   "compagnie": "Air Canada",
+   "numero": "AC 894",
+   "date": "2026-08-14",
+   "de": "Montréal YUL",
+   "depart": "20 h 45",
+   "vers": "Milan MXP",
+   "arrivee": "10 h 20 (+1)",
+   "aerogare": "Malpensa"
+  },
+  {
+   "foyer": "Greg et Jo-Annie",
+   "sens": "Retour",
+   "personnes": "Greg, Jo-Annie, Liam (6 ans), Miko (3 ans)",
+   "compagnie": "Air Canada",
+   "numero": "AC 883",
+   "date": "2026-08-27",
+   "de": "Naples NAP",
+   "depart": "11 h 35",
+   "vers": "Montréal YUL",
+   "arrivee": "14 h 45",
+   "aerogare": "Capodichino, aérogare 1"
+  },
+  {
+   "foyer": "Alex et Véro",
+   "sens": "Aller",
+   "personnes": "Alex, Véro, Édouard (3 ans)",
+   "compagnie": "",
+   "numero": "",
+   "date": "",
+   "de": "",
+   "depart": "",
+   "vers": "Milan MXP",
+   "arrivee": "",
+   "aerogare": ""
+  },
+  {
+   "foyer": "Alex et Véro",
+   "sens": "Retour",
+   "personnes": "Alex, Véro, Édouard (3 ans)",
+   "compagnie": "",
+   "numero": "",
+   "date": "",
+   "de": "",
+   "depart": "",
+   "vers": "",
+   "arrivee": "",
+   "aerogare": ""
+  },
+  {
+   "foyer": "Dieu Do et Val",
+   "sens": "Aller",
+   "personnes": "Dieu Do, Val",
+   "compagnie": "",
+   "numero": "",
+   "date": "",
+   "de": "",
+   "depart": "",
+   "vers": "Milan MXP",
+   "arrivee": "",
+   "aerogare": ""
+  },
+  {
+   "foyer": "Dieu Do et Val",
+   "sens": "Retour",
+   "personnes": "Dieu Do, Val",
+   "compagnie": "",
+   "numero": "",
+   "date": "",
+   "de": "",
+   "depart": "",
+   "vers": "",
+   "arrivee": "",
+   "aerogare": ""
+  }
+ ],
+ "logistique": [
+  {
+   "jour": 1,
+   "categorie": "Transport",
+   "libelle": "Application taxi",
+   "valeur": "FreeNow — à télécharger avant le départ"
+  },
+  {
+   "jour": 1,
+   "categorie": "Logement",
+   "libelle": "Dépôt des bagages",
+   "valeur": "Possible dès 10 h 30"
+  },
+  {
+   "jour": 1,
+   "categorie": "Logement",
+   "libelle": "Arrivée",
+   "valeur": "Autonome, sans accueil"
+  },
+  {
+   "jour": 3,
+   "categorie": "Transport",
+   "libelle": "Billets de train",
+   "valeur": "Milan → Varenna-Esino, à commander la veille"
+  },
+  {
+   "jour": 3,
+   "categorie": "Transport",
+   "libelle": "Durée du trajet",
+   "valeur": "1 h 00 à 1 h 10"
+  },
+  {
+   "jour": 4,
+   "categorie": "Transport",
+   "libelle": "Passe de train",
+   "valeur": "Une passe existe pour les Cinque Terre, plus avantageuse"
+  },
+  {
+   "jour": 6,
+   "categorie": "Auto",
+   "libelle": "Location",
+   "valeur": "Enterprise, prise à 10 h 00"
+  },
+  {
+   "jour": 6,
+   "categorie": "Auto",
+   "libelle": "Plaque du véhicule",
+   "valeur": ""
+  },
+  {
+   "jour": 6,
+   "categorie": "Auto",
+   "libelle": "Numéro de réservation",
+   "valeur": ""
+  },
+  {
+   "jour": 11,
+   "categorie": "Excursion",
+   "libelle": "Stationnement",
+   "valeur": "Parcheggio Comunale Achille Lauro, Via Correale, Sorrento"
+  },
+  {
+   "jour": 13,
+   "categorie": "Vol",
+   "libelle": "Numéro de vol",
+   "valeur": ""
+  },
+  {
+   "jour": 13,
+   "categorie": "Auto",
+   "libelle": "Retour du véhicule",
+   "valeur": "Enterprise, aéroport de Naples"
+  }
+ ],
+ "checklistGroupe": [
+  {
+   "categorie": "Avant le départ",
+   "item": "Télécharger l'application FreeNow (taxi)",
+   "responsable": "Tous",
+   "echeance": "Avant le départ",
+   "jour": "",
+   "fait": false
+  },
+  {
+   "categorie": "Avant le départ",
+   "item": "Télécharger les cartes Google Maps hors ligne (Italie)",
+   "responsable": "Tous",
+   "echeance": "Avant le départ",
+   "jour": "",
+   "fait": false
+  },
+  {
+   "categorie": "Avant le départ",
+   "item": "Vérifier la validité des passeports",
+   "responsable": "Tous",
+   "echeance": "Avant le départ",
+   "jour": "",
+   "fait": false
+  },
+  {
+   "categorie": "Avant le départ",
+   "item": "Forfait cellulaire international ou eSIM",
+   "responsable": "Tous",
+   "echeance": "Avant le départ",
+   "jour": "",
+   "fait": false
+  },
+  {
+   "categorie": "Avant le départ",
+   "item": "Permis de conduire international",
+   "responsable": "",
+   "echeance": "Avant le départ",
+   "jour": "",
+   "fait": false
+  },
+  {
+   "categorie": "Avant le départ",
+   "item": "Assurance voyage confirmée",
+   "responsable": "",
+   "echeance": "Avant le départ",
+   "jour": "",
+   "fait": false
+  },
+  {
+   "categorie": "À apporter",
+   "item": "Casques de bain pour la piscine (Milan)",
+   "responsable": "Tous",
+   "echeance": "Bagages",
+   "jour": "",
+   "fait": false
+  },
+  {
+   "categorie": "À apporter",
+   "item": "Souliers d'eau (Lac de Côme, Cinque Terre)",
+   "responsable": "Tous",
+   "echeance": "Bagages",
+   "jour": "",
+   "fait": false
+  },
+  {
+   "categorie": "À apporter",
+   "item": "Adaptateur de prise européen",
+   "responsable": "",
+   "echeance": "Bagages",
+   "jour": "",
+   "fait": false
+  },
+  {
+   "categorie": "À apporter",
+   "item": "Crème solaire et chapeaux",
+   "responsable": "",
+   "echeance": "Bagages",
+   "jour": "",
+   "fait": false
+  },
+  {
+   "categorie": "Sur place",
+   "item": "Commander les billets Milan → Varenna-Esino",
+   "responsable": "",
+   "echeance": "Veille du jour 3",
+   "jour": "",
+   "fait": false
+  },
+  {
+   "categorie": "Sur place",
+   "item": "Vérifier la passe de train Cinque Terre",
+   "responsable": "",
+   "echeance": "Jour 4",
+   "jour": "",
+   "fait": false
+  },
+  {
+   "categorie": "Sur place",
+   "item": "Confirmer l'excursion en bateau",
+   "responsable": "",
+   "echeance": "Avant le jour 11",
+   "jour": "",
+   "fait": false
+  },
+  {
+   "categorie": "Sur place",
+   "item": "Réserver le vignoble Castello di Meleto",
+   "responsable": "",
+   "echeance": "Avant le jour 7",
+   "jour": "",
+   "fait": false
+  }
+ ],
+ "checklistPerso": [
+  {
+   "categorie": "Documents",
+   "item": "Passeport"
+  },
+  {
+   "categorie": "Documents",
+   "item": "Carte d'assurance voyage"
+  },
+  {
+   "categorie": "Documents",
+   "item": "Permis de conduire"
+  },
+  {
+   "categorie": "Électronique",
+   "item": "Chargeurs et câbles"
+  },
+  {
+   "categorie": "Électronique",
+   "item": "Batterie externe"
+  },
+  {
+   "categorie": "Électronique",
+   "item": "Adaptateur européen"
+  },
+  {
+   "categorie": "Vêtements",
+   "item": "Maillot de bain"
+  },
+  {
+   "categorie": "Vêtements",
+   "item": "Casque de bain"
+  },
+  {
+   "categorie": "Vêtements",
+   "item": "Souliers d'eau"
+  },
+  {
+   "categorie": "Vêtements",
+   "item": "Souliers de marche confortables"
+  },
+  {
+   "categorie": "Vêtements",
+   "item": "Tenue pour les soirées"
+  },
+  {
+   "categorie": "Santé",
+   "item": "Médicaments personnels"
+  },
+  {
+   "categorie": "Santé",
+   "item": "Crème solaire"
+  },
+  {
+   "categorie": "Santé",
+   "item": "Trousse de premiers soins"
+  }
+ ],
+ "alertes": [
+  {
+   "jour": 1,
+   "titre": "Ferragosto — le 15 août est férié",
+   "texte": "C'est la plus grande fête nationale italienne. Une bonne partie des commerces et des épiceries sont fermés, et les transports roulent au ralenti. Prévoir de quoi manger le soir de l'arrivée plutôt que compter sur l'épicerie."
+  },
+  {
+   "jour": 6,
+   "titre": "ZTL de Sienne — amende automatique",
+   "texte": "Le centre est une zone à trafic limité surveillée par caméra. Chaque passage non autorisé génère une contravention, refacturée des mois plus tard par la compagnie de location avec des frais. Se stationner au Parcheggio Il Campo et continuer à pied."
+  },
+  {
+   "jour": 6,
+   "titre": "Ne rien laisser de visible dans l'auto",
+   "texte": "Vider l'habitacle à chaque arrêt, coffre inclus."
+  },
+  {
+   "jour": 7,
+   "titre": "ZTL de Sienne et de San Gimignano",
+   "texte": "Même règle qu'hier : on stationne à l'extérieur des murs et on marche."
+  },
+  {
+   "jour": 9,
+   "titre": "Quatre heures et demie de route avec trois enfants",
+   "texte": "Départ à 6 h 30. Prévoir deux arrêts, de quoi manger dans l'auto, et accepter que l'arrivée glisse. Le lac Bolsena est une bonne halte à mi-chemin."
+  },
+  {
+   "jour": 10,
+   "titre": "Positano est un village d'escaliers",
+   "texte": "Une poussette y est inutilisable. Porte-bébé pour Miko et Édouard, et souliers fermés."
+  },
+  {
+   "jour": 10,
+   "titre": "Circulation par plaques sur la côte amalfitaine",
+   "texte": "L'été, la route côtière applique parfois une alternance plaques paires et impaires. À vérifier auprès du loueur quelques jours avant le départ."
+  },
+  {
+   "jour": 11,
+   "titre": "Départ à 8 h 15, sans marge",
+   "texte": "Le bateau ne rattrape pas les retards. Compter le trajet depuis Sant'Agata et le stationnement."
+  }
+ ],
+ "sac": [
+  {
+   "jour": 2,
+   "item": "Casques de bain"
+  },
+  {
+   "jour": 2,
+   "item": "Souliers de marche"
+  },
+  {
+   "jour": 2,
+   "item": "Bouteilles d'eau"
+  },
+  {
+   "jour": 3,
+   "item": "Souliers d'eau"
+  },
+  {
+   "jour": 3,
+   "item": "Maillots et serviettes"
+  },
+  {
+   "jour": 3,
+   "item": "Crème solaire"
+  },
+  {
+   "jour": 4,
+   "item": "De quoi manger dans le train"
+  },
+  {
+   "jour": 4,
+   "item": "Batterie externe"
+  },
+  {
+   "jour": 5,
+   "item": "Souliers d'eau"
+  },
+  {
+   "jour": 5,
+   "item": "Maillots et serviettes"
+  },
+  {
+   "jour": 5,
+   "item": "Crème solaire"
+  },
+  {
+   "jour": 6,
+   "item": "Monnaie pour le stationnement"
+  },
+  {
+   "jour": 6,
+   "item": "Collations pour la route"
+  },
+  {
+   "jour": 7,
+   "item": "Chapeaux"
+  },
+  {
+   "jour": 7,
+   "item": "Bouteilles d'eau"
+  },
+  {
+   "jour": 7,
+   "item": "Monnaie pour le stationnement"
+  },
+  {
+   "jour": 8,
+   "item": "Chapeaux"
+  },
+  {
+   "jour": 8,
+   "item": "Bouteilles d'eau"
+  },
+  {
+   "jour": 8,
+   "item": "Appareil photo"
+  },
+  {
+   "jour": 9,
+   "item": "Collations et jeux pour la route"
+  },
+  {
+   "jour": 9,
+   "item": "Bouteilles d'eau"
+  },
+  {
+   "jour": 10,
+   "item": "Porte-bébé"
+  },
+  {
+   "jour": 10,
+   "item": "Souliers fermés"
+  },
+  {
+   "jour": 10,
+   "item": "Crème solaire"
+  },
+  {
+   "jour": 11,
+   "item": "Crème solaire"
+  },
+  {
+   "jour": 11,
+   "item": "Coupe-vent"
+  },
+  {
+   "jour": 11,
+   "item": "Maillots et serviettes"
+  },
+  {
+   "jour": 12,
+   "item": "Maillots et serviettes"
+  },
+  {
+   "jour": 12,
+   "item": "Argent comptant"
+  },
+  {
+   "jour": 12,
+   "item": "Crème solaire"
+  }
+ ],
+ "contacts": [
+  {
+   "nom": "Urgences Italie",
+   "role": "Numéro d'urgence européen",
+   "telephone": "112",
+   "note": "Police, ambulance, pompiers"
+  },
+  {
+   "nom": "Ambassade du Canada — Rome",
+   "role": "Assistance consulaire",
+   "telephone": "+39 06 85444 2911",
+   "note": "Via Zara 30, Rome"
+  },
+  {
+   "nom": "Hôte Airbnb — Milan",
+   "role": "Hébergement",
+   "telephone": "",
+   "note": "Via Edmondo de Amicis 59"
+  },
+  {
+   "nom": "Hôte Airbnb — La Spezia",
+   "role": "Hébergement",
+   "telephone": "",
+   "note": "Via Lazzaro Spallanzani 13"
+  },
+  {
+   "nom": "Hôte Villa — Sienne",
+   "role": "Hébergement",
+   "telephone": "",
+   "note": "Strada di Larniano 45"
+  },
+  {
+   "nom": "Hôte Airbnb — Sant'Agata",
+   "role": "Hébergement",
+   "telephone": "",
+   "note": "Via Pontone 10"
+  },
+  {
+   "nom": "Enterprise — La Spezia",
+   "role": "Location d'auto",
+   "telephone": "",
+   "note": "Prise du véhicule, jour 6"
+  }
+ ],
+ "notes": []
+};
+const ONGLETS = ["Config","Jours","Activites","Options","Vols","Logistique",
+                 "Checklist_Groupe","Checklist_Perso","Alertes","Sac_du_jour","Contacts","Notes_Terrain"];
+
+/* ---------- stockage tolérant ---------- */
+const mem = {};
+const store = {
+  get(k){ try{ const v=localStorage.getItem(k); return v===null?(k in mem?mem[k]:null):v; }catch(e){ return k in mem?mem[k]:null; } },
+  set(k,v){ mem[k]=v; try{ localStorage.setItem(k,v); }catch(e){} }
+};
+const jget=(k,d)=>{ try{ const v=store.get(k); return v?JSON.parse(v):d; }catch(e){ return d; } };
+const jset=(k,v)=> store.set(k,JSON.stringify(v));
+
+let DATA = jget("cache_data",null) || SEED;
+let etat = { tab:"jour", jour:1, feuille:null };
+let SHEET_ID  = store.get("sheet_id")  || "";
+let SCRIPT_URL= store.get("script_url")|| "";
+let MOI       = store.get("moi")       || "";
+
+const el=h=>{ const d=document.createElement("div"); d.innerHTML=h.trim(); return d.firstElementChild; };
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const maps=q=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q);
+const MOIS=["janv.","févr.","mars","avr.","mai","juin","juill.","août","sept.","oct.","nov.","déc."];
+const JS=["dim","lun","mar","mer","jeu","ven","sam"];
+const PIN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.2"/></svg>';
+const OK='<svg viewBox="0 0 24 24" fill="none" stroke="#FBF8F0" stroke-width="3"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+
+/* ---------- dates : tolérant aux formats de Sheets ---------- */
+function lireDate(v){
+  if(v==null) return null;
+  if(v instanceof Date) return isNaN(v)?null:v;
+  let s=String(v).trim(); if(!s) return null;
+  let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);            if(m) return new Date(+m[1],+m[2]-1,+m[3]);
+  m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if(m){ let a=+m[1],b=+m[2]; return a>12? new Date(+m[3],b-1,a) : new Date(+m[3],a-1,b); }
+  if(/^\d+(\.\d+)?$/.test(s)){                                // numéro de série Sheets
+    const n=parseFloat(s);
+    if(n>20000 && n<80000) return new Date(Date.UTC(1899,11,30)+n*86400000);
+  }
+  const d=new Date(s); return isNaN(d)?null:d;
+}
+const cfg=()=>DATA.config||{};
+function dateJour(n){
+  const d0=lireDate(cfg().date_jour_1); if(!d0) return null;
+  return new Date(d0.getFullYear(), d0.getMonth(), d0.getDate()+(n-1));
+}
+const fmt=d=> d? `${JS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]}` : "";
+function aujourdhui(){
+  const a=new Date(); a.setHours(0,0,0,0);
+  for(const j of (DATA.jours||[])){ const d=dateJour(j.jour); if(d && d.getTime()===a.getTime()) return j.jour; }
+  return null;
+}
+function dodos(){
+  const d=dateJour(1); if(!d) return null;
+  const a=new Date(); a.setHours(0,0,0,0);
+  const n=Math.round((d-a)/86400000); return n>0?n:null;
+}
+/* "11 h 05" -> 665 minutes */
+function minutes(h){
+  const m=String(h||"").match(/(\d{1,2})\s*h\s*(\d{2})?/i);
+  return m? (+m[1])*60 + (+(m[2]||0)) : null;
+}
+
+/* ---------- CSV ---------- */
+function parseCSV(t){
+  const out=[]; let l=[],c="",q=false;
+  for(let i=0;i<t.length;i++){ const x=t[i];
+    if(q){ if(x==='"'){ if(t[i+1]==='"'){c+='"';i++;} else q=false; } else c+=x; }
+    else if(x==='"') q=true;
+    else if(x===','){ l.push(c); c=""; }
+    else if(x==='\n'){ l.push(c); out.push(l); l=[]; c=""; }
+    else if(x!=='\r') c+=x;
+  }
+  if(c.length||l.length){ l.push(c); out.push(l); }
+  return out.filter(r=> r.some(v=>String(v).trim()!==""));
+}
+function objets(rows){
+  if(!rows.length) return [];
+  const h=rows[0].map(x=>String(x).trim());
+  return rows.slice(1).map(r=>{ const o={}; h.forEach((k,i)=> o[k]=(r[i]||"").trim()); return o; });
+}
+/* "6.0" et 6 doivent se valoir */
+const num=v=>{ const s=String(v==null?"":v).trim(); const n=parseFloat(s);
+  return (s!=="" && !isNaN(n) && /^-?\d+(\.\d+)?$/.test(s))? String(Math.round(n)) : s; };
+
+/* ---------- synchronisation ---------- */
+function setSync(c,t){ const s=document.getElementById("sync");
+  s.className="sync "+c; document.getElementById("syncTxt").textContent=t; }
+async function sync(){
+  if(!SHEET_ID){ setSync("","Contenu local"); return; }
+  setSync("load","Mise à jour…");
+  try{
+    const paq=await Promise.all(ONGLETS.map(async n=>{
+      const u=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(n)}`;
+      const r=await fetch(u,{cache:"no-store"}); if(!r.ok) throw new Error(n);
+      return [n, objets(parseCSV(await r.text()))];
+    }));
+    const m=Object.fromEntries(paq), c={};
+    (m.Config||[]).forEach(r=>{ if(r.cle) c[r.cle]=r.valeur; });
+    const D2={
+      config:c,
+      jours:(m.Jours||[]).map(r=>({jour:+r.jour,titre:r.titre,sous_titre:r.sous_titre,ville:r.ville,
+        etape:r.etape,route:r.route,hebergement:r.hebergement,adresse:r.adresse,
+        reservation:r.lien_reservation,image:r.image,imageBas:r.image_bas})),
+      activites:(m.Activites||[]).map(r=>({jour:+r.jour,ordre:+r.ordre,heure:r.heure,type:r.type,
+        titre:r.titre,details:r.details,lieu:r.lieu_maps,fixe:r.fixe})),
+      options:(m.Options||[]).map(r=>({id:r.id,groupe:r.groupe,jours:r.jours_possibles,titre:r.titre,
+        resume:r.resume,details:r.details,lieu:r.lieu_maps,image:r.image,
+        choix:num(r.choix),par:r.decide_par})),
+      vols:(m.Vols||[]).map(r=>({foyer:r.foyer,sens:r.sens,personnes:r.personnes,compagnie:r.compagnie,
+        numero:r.numero,date:r.date,de:r.de,depart:r.heure_depart,vers:r.vers,
+        arrivee:r.heure_arrivee,aerogare:r.aerogare})),
+      logistique:(m.Logistique||[]).map(r=>({jour:+r.jour,categorie:r.categorie,libelle:r.libelle,valeur:r.valeur})),
+      checklistGroupe:(m.Checklist_Groupe||[]).map(r=>({categorie:r.categorie,item:r.item,
+        responsable:r.responsable,echeance:r.echeance,jour:r.jour_lie,
+        fait:(r.fait||"").toUpperCase()==="OUI"})),
+      checklistPerso:(m.Checklist_Perso||[]).map(r=>({categorie:r.categorie,item:r.item})),
+      alertes:(m.Alertes||[]).map(r=>({jour:+r.jour,titre:r.titre,texte:r.texte})),
+      sac:(m.Sac_du_jour||[]).map(r=>({jour:+r.jour,item:r.item})),
+      contacts:(m.Contacts||[]).map(r=>({nom:r.nom,role:r.role,telephone:r.telephone,note:r.note})),
+      notes:(m.Notes_Terrain||[]).map(r=>({date:r.date,auteur:r.auteur,jour:+r.jour,message:r.message}))
+              .filter(x=>x.message)
+    };
+    if(!D2.jours.length) throw new Error("vide");
+    DATA=D2; jset("cache_data",DATA); store.set("cache_ts",new Date().toISOString());
+    setSync("ok","À jour"); enAttente=0; rendre();
+  }catch(e){
+    setSync("off", store.get("cache_ts")? "Hors ligne" : "Contenu local");
+  }
+}
+
+/* ---------- écriture ---------- */
+let enAttente=0;
+function toast(t,persistant){
+  let n=document.getElementById("toast");
+  if(!n){ n=el('<div id="toast"></div>'); document.body.appendChild(n); }
+  n.textContent=t; n.classList.add("on"); clearTimeout(n._t);
+  if(!persistant) n._t=setTimeout(()=>n.classList.remove("on"),2600);
+}
+async function envoyer(charge,msg){
+  if(!SCRIPT_URL){ toast("Passerelle non branchée. Écran Réglages, en haut à droite."); return false; }
+  if(!MOI){ MOI=(prompt("Ton prénom, pour que le groupe sache qui a décidé :")||"").trim(); store.set("moi",MOI); }
+  charge.par=MOI; charge.auteur=MOI;
+  enAttente++; toast((msg||"Envoi")+" — en attente du groupe…", true);
+  try{
+    await fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(charge)});
+    setTimeout(async()=>{ await sync();
+      toast(enAttente<=0? (msg||"Enregistré")+" · le groupe le voit" : (msg||"Enregistré")+" · sur cet appareil");
+    },2000);
+    return true;
+  }catch(e){ enAttente--; toast("Envoi impossible. Ce sera visible seulement ici."); return false; }
+}
+
+const optJour=n=>(DATA.options||[]).filter(o=>
+  String(o.jours||"").split(",").map(x=>x.trim()).includes(String(n)));
+const volsSens=s=>(DATA.vols||[]).filter(v=>(v.sens||"").toLowerCase().startsWith(s));
+
+/* ---------- pastilles ---------- */
+function rendreNav(){
+  const n=document.getElementById("navjours"); n.innerHTML="";
+  const auj=aujourdhui(), tot=(DATA.jours||[]).length;
+  const g=el(`<button class="fleche" ${etat.jour<=1?"disabled":""} aria-label="Jour précédent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>`);
+  const d=el(`<button class="fleche" ${etat.jour>=tot?"disabled":""} aria-label="Jour suivant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></button>`);
+  g.onclick=()=>aller(etat.jour-1); d.onclick=()=>aller(etat.jour+1);
+  const bande=el('<div class="days"></div>');
+  (DATA.jours||[]).forEach(j=>{
+    const dd=dateJour(j.jour);
+    const b=el(`<button class="chip${j.jour===etat.jour?" on":""}${j.jour===auj?" today":""}">
+      <b>J${j.jour}</b><i>${esc(dd?fmt(dd):(j.ville||""))}</i></button>`);
+    b.onclick=()=>aller(j.jour); bande.appendChild(b);
+  });
+  n.append(g,bande,d);
+  const on=bande.querySelector(".chip.on"); if(on) on.scrollIntoView({block:"nearest",inline:"center"});
+}
+function aller(n){
+  const tot=(DATA.jours||[]).length;
+  if(n<1||n>tot) return;
+  etat.jour=n; etat.tab="jour"; rendre();
+}
+
+/* ---------- vue journée ---------- */
+function vueJour(){
+  const j=(DATA.jours||[]).find(x=>x.jour===etat.jour)||(DATA.jours||[])[0];
+  if(!j) return `<div class="sect"><p class="empty">Aucune journée dans le fichier source.</p></div>`;
+  const d=dateJour(j.jour), auj=aujourdhui()===j.jour, tot=(DATA.jours||[]).length;
+  const acts=(DATA.activites||[]).filter(a=>a.jour===j.jour).sort((a,b)=>a.ordre-b.ordre);
+  const fixes=acts.filter(a=>String(a.fixe||"").toUpperCase()==="OUI");
+  let h="";
+
+  if(j.image) h+=`<div class="hero"><img src="${esc(j.image)}" alt="" loading="lazy"
+    onerror="this.parentNode.remove();document.querySelector('.dayhead').classList.add('nohero')"></div>`;
+  h+=`<section class="dayhead${j.image?"":" nohero"}">
+    <div class="numcol"><div class="n">${j.jour}</div><div class="l">jour</div></div>
+    <div class="txtcol">
+      <div class="quand">${auj?"<b>aujourd'hui</b> · ":""}${esc(d?fmt(d):"date à confirmer")}${j.ville?" · "+esc(j.ville):""}</div>
+      <h2>${esc(j.titre)}</h2>
+      ${j.sous_titre?`<p class="sous">${esc(j.sous_titre)}</p>`:""}
+      ${j.etape?`<div class="trajet">${esc(j.etape)}${j.route?` <em>· ${esc(j.route)} de trajet</em>`:""}</div>`:""}
+    </div></section>`;
+
+  /* prochain élément fixe, seulement le jour même */
+  if(auj){
+    const maint=new Date().getHours()*60+new Date().getMinutes();
+    const suiv=fixes.map(a=>({a,m:minutes(a.heure)})).filter(x=>x.m!==null&&x.m>=maint)
+                    .sort((x,y)=>x.m-y.m)[0];
+    if(suiv) h+=`<div class="suivant"><b>Prochain</b>${esc(suiv.a.heure)} — ${esc(suiv.a.titre)}</div>`;
+  }
+  if(fixes.length){
+    const t=fixes.map(a=>a.heure? esc(a.heure)+" "+esc(a.titre.toLowerCase().split(",")[0]) : esc(a.titre)).join(" · ");
+    h+=`<div class="ancres"><b>À ne pas manquer</b>${t}</div>`;
+  }
+
+  const al=(DATA.alertes||[]).filter(a=>a.jour===j.jour);
+  if(al.length){
+    h+=`<div class="sect"><h3>Bon à savoir</h3>`;
+    al.forEach(a=>h+=`<div class="alerte"><b>${esc(a.titre)}</b><p>${esc(a.texte)}</p></div>`);
+    h+=`</div>`;
+  }
+
+  if(j.jour===1||j.jour===tot){
+    const sens=j.jour===1?"aller":"retour";
+    const v=volsSens(sens);
+    if(v.length){
+      h+=`<div class="sect"><h3>${j.jour===1?"Qui arrive quand":"Qui repart quand"}</h3><div class="card">`;
+      v.slice().sort((a,b)=>String(j.jour===1?a.arrivee:a.depart).localeCompare(String(j.jour===1?b.arrivee:b.depart)))
+       .forEach(x=>{ const hh=j.jour===1?x.arrivee:x.depart;
+        h+=`<div class="row"><div class="k">${esc(hh||"à venir")}</div><div class="v">${esc(x.personnes||x.foyer)}</div></div>`; });
+      h+=`</div><button class="big" data-go="vols" style="margin-top:9px"><span>Détail des vols</span><span class="m">Infos ›</span></button></div>`;
+    }
+  }
+
+  if(acts.length){
+    h+=`<div class="sect"><h3>Le programme</h3><ul class="rail">`;
+    acts.forEach(a=>{
+      const t=(a.type||"").toLowerCase(), fige=String(a.fixe||"").toUpperCase()==="OUI";
+      h+=`<li class="step ${esc(t)}${fige?" fige":""}"><span class="mark"><i></i></span>
+        ${a.heure?`<span class="heure${fige?"":" libre"}">${esc(a.heure)}</span>`:
+                  (fige?`<span class="heure">fixe</span>`:"")}
+        <div class="t">${esc(a.titre)}</div>
+        ${a.details?`<div class="d">${esc(a.details)}</div>`:""}
+        ${a.lieu?`<a class="maps" href="${maps(a.lieu)}" target="_blank" rel="noopener">${PIN}Ouvrir dans Maps</a>`:""}
+      </li>`;
+    });
+    h+=`</ul></div>`;
+  }
+
+  const opts=optJour(j.jour);
+  if(opts.length){
+    const grp={}; opts.forEach(o=>(grp[o.groupe]=grp[o.groupe]||[]).push(o));
+    Object.keys(grp).forEach(g=>{
+      const pris=grp[g].filter(o=>o.choix===String(j.jour)).length;
+      h+=`<div class="sect"><h3>${esc(g)} <span class="cpt">${pris?pris+" retenue"+(pris>1?"s":""):"rien de tranché"}</span></h3>`;
+      grp[g].forEach(o=>{
+        const ici=o.choix===String(j.jour), non=(o.choix||"").toUpperCase()==="NON";
+        const ail=o.choix&&!ici&&!non;
+        h+=`<div class="opt${ici?" choisi":""}${(non||ail)?" ecarte":""}">
+          ${o.image?`<img class="vign" src="${esc(o.image)}" alt="" loading="lazy" onerror="this.remove()">`:""}
+          <div class="corps">
+            ${ici?`<span class="etat">retenu · jour ${j.jour}${o.par?" · "+esc(o.par):""}</span>`:""}
+            ${ail?`<span class="etat gris">retenu · jour ${esc(o.choix)}${o.par?" · "+esc(o.par):""}</span>`:""}
+            ${non?`<span class="etat gris">écarté${o.par?" · "+esc(o.par):""}</span>`:""}
+            <h4>${esc(o.titre)}</h4>
+            ${o.resume?`<p>${esc(o.resume)}</p>`:""}
+            ${ici&&o.details?`<p style="color:var(--ink)">${esc(o.details)}</p>`:""}
+            <div class="actes">
+              ${o.lieu?`<a class="maps" style="margin:0" href="${maps(o.lieu)}" target="_blank" rel="noopener">${PIN}Maps</a>`:""}
+              ${ici?"":`<button class="bt oui" data-opt="${esc(o.id)}" data-val="${j.jour}">On fait ça ce jour-ci</button>`}
+              ${non?"":`<button class="bt" data-opt="${esc(o.id)}" data-val="NON">Écarter</button>`}
+              ${(ici||non||ail)?`<button class="bt" data-opt="${esc(o.id)}" data-val="">Annuler</button>`:""}
+            </div>
+          </div></div>`;
+      });
+      h+=`</div>`;
+    });
+  }
+
+  const sac=(DATA.sac||[]).filter(s=>s.jour===j.jour);
+  if(sac.length){
+    h+=`<div class="sect"><h3>Dans le sac</h3><div class="card">
+      ${sac.map(s=>`<div class="row"><div class="v">${esc(s.item)}</div></div>`).join("")}</div></div>`;
+  }
+
+  if(j.hebergement||j.adresse){
+    h+=`<div class="sect"><h3>Où l'on dort</h3><div class="card">
+      <div class="row"><div class="k">Logement</div><div class="v">${esc(j.hebergement||"—")}</div></div>
+      ${j.adresse?`<div class="row"><div class="k">Adresse</div><div class="v">${esc(j.adresse)}
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+        <button class="bt" data-copie="${esc(j.adresse)}">Copier</button>
+        <a class="maps" style="margin:0" href="${maps(j.adresse)}" target="_blank" rel="noopener">${PIN}Y aller</a>
+        ${j.reservation?`<a class="bt" href="${esc(j.reservation)}" target="_blank" rel="noopener">Réservation</a>`:""}
+        </div></div></div>`:""}
+    </div></div>`;
+  }
+
+  const logi=(DATA.logistique||[]).filter(l=>l.jour===j.jour);
+  if(logi.length){
+    h+=`<div class="sect"><h3>Logistique</h3><div class="card">`;
+    logi.forEach(l=>h+=`<div class="row"><div class="k">${esc(l.categorie)}</div><div class="v">${esc(l.libelle)}
+      ${l.valeur?`<br><em>${esc(l.valeur)}</em>`:`<br><em>à compléter dans le fichier</em>`}</div></div>`);
+    h+=`</div></div>`;
+  }
+
+  const notes=(DATA.notes||[]).filter(n=>n.jour===j.jour);
+  h+=`<div class="sect"><h3>Notes de la journée</h3><div class="card">`;
+  if(notes.length) notes.forEach(n=>h+=`<div class="note">
+      <div class="meta"><b>${esc(n.auteur||"—")}</b><em>${esc(quand(n.date))}</em></div>
+      <div class="txt">${esc(n.message)}</div></div>`);
+  else h+=`<p class="empty">Rien de consigné pour cette journée.</p>`;
+  h+=`<div class="compo"><textarea id="msg" placeholder="Consigner quelque chose…"></textarea>
+      <button class="bt oui" id="envMsg">Ajouter</button></div>
+      <p class="aide" style="margin:8px 0 0">Pour prévenir le groupe tout de suite, passe par vos textos —
+      l'app ne sonne pas.</p></div></div>`;
+
+  if(j.imageBas) h+=`<img class="imgbas" src="${esc(j.imageBas)}" alt="" loading="lazy" onerror="this.remove()">`;
+
+  h+=`<div class="pied">
+    <button ${j.jour<=1?"disabled":""} data-nav="${j.jour-1}">← précédent${j.jour>1?`<b>Jour ${j.jour-1}</b>`:""}</button>
+    <button ${j.jour>=tot?"disabled":""} data-nav="${j.jour+1}">suivant →${j.jour<tot?`<b>Jour ${j.jour+1}</b>`:""}</button>
+  </div>`;
+  if(j.jour===tot && cfg().citation) h+=`<div class="citation"><p>${esc(cfg().citation)}</p></div>`;
+  return h;
+}
+function quand(v){
+  const d=lireDate(v); if(!d) return "";
+  const m=String(v).match(/(\d{1,2}):(\d{2})/);
+  return `${d.getDate()} ${MOIS[d.getMonth()]}${m?`, ${m[1]} h ${m[2]}`:""}`;
+}
+
+/* ---------- vue infos ---------- */
+function vueInfos(){
+  const c=cfg();
+  let h=`<div class="hero" style="height:132px"><img src="couverture.webp" alt="" onerror="this.parentNode.remove()"></div>`;
+
+  h+=`<div class="sect" style="padding-top:14px"><h3 id="vols">Les vols</h3><div class="card">`;
+  ["Aller","Retour"].forEach(s=>{
+    h+=`<div class="cat">${s}</div>`;
+    volsSens(s.toLowerCase()).forEach(v=>{
+      h+=`<div class="row"><div class="k">${esc(v.foyer)}</div><div class="v">${esc(v.personnes)}
+        ${v.numero?`<br><em>${esc(v.compagnie)} ${esc(v.numero)} · ${esc(v.de)} ${esc(v.depart)} → ${esc(v.vers)} ${esc(v.arrivee)}</em>`
+                  :`<br><em>vol à confirmer</em>`}
+        ${v.aerogare?`<br><em>${esc(v.aerogare)}</em>`:""}</div></div>`;
+    });
+  });
+  h+=`</div></div>`;
+
+  h+=`<div class="sect"><h3>Où l'on dort</h3><div class="card">`;
+  const vus=new Set();
+  (DATA.jours||[]).forEach(j=>{
+    if(!j.adresse||vus.has(j.adresse)) return; vus.add(j.adresse);
+    h+=`<div class="row"><div class="k">${esc(j.hebergement||"")}</div><div class="v">${esc(j.adresse)}
+      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+      <button class="bt" data-copie="${esc(j.adresse)}">Copier</button>
+      <a class="maps" style="margin:0" href="${maps(j.adresse)}" target="_blank" rel="noopener">${PIN}Maps</a>
+      ${j.reservation?`<a class="bt" href="${esc(j.reservation)}" target="_blank" rel="noopener">Réservation</a>`:""}
+      </div></div></div>`;
+  });
+  h+=`</div></div>`;
+
+  const dec=(DATA.options||[]).filter(o=>o.choix);
+  h+=`<div class="sect"><h3>Décisions <span class="cpt">${dec.length}/${(DATA.options||[]).length}</span></h3><div class="card">`;
+  if(!dec.length) h+=`<p class="empty">Rien de tranché pour l'instant.</p>`;
+  dec.forEach(o=>{ const non=(o.choix||"").toUpperCase()==="NON";
+    h+=`<div class="row"><div class="k">${non?"écarté":"jour "+esc(o.choix)}</div>
+      <div class="v">${esc(o.titre)}<br><em>${esc(o.groupe)}${o.par?" · "+esc(o.par):""}</em></div></div>`; });
+  h+=`</div></div>`;
+
+  h+=`<div class="sect"><h3>Les outils du groupe</h3>`;
+  [["Dépenses partagées",c.lien_splitwise,"Splitwise"],
+   ["Album photo",c.lien_photos,"Partagé"],
+   ["Fichier du voyage",c.lien_sheet||(SHEET_ID?`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`:""),"Sheets"]]
+  .forEach(([t,u,m])=>{ h+= u
+    ? `<a class="big" href="${esc(u)}" target="_blank" rel="noopener"><span>${t}</span><span class="m">${m} ›</span></a>`
+    : `<div class="big" style="opacity:.5"><span>${t}</span><span class="m">lien à ajouter</span></div>`; });
+  h+=`<button class="big" data-feuille="intro"><span>Comment ça marche</span><span class="m">Lire ›</span></button></div>`;
+
+  h+=`<div class="sect"><h3>Contacts</h3><div class="card">`;
+  (DATA.contacts||[]).forEach(k=>{
+    h+=`<div class="row"><div class="k">${esc(k.role||"")}</div><div class="v">${esc(k.nom)}
+      ${k.telephone?`<br><a href="tel:${esc(String(k.telephone).replace(/\s/g,""))}" style="font-family:var(--mono);font-size:12.5px;color:var(--teal)">${esc(k.telephone)}</a>`
+                   :`<br><em>numéro à ajouter</em>`}
+      ${k.note?`<br><em>${esc(k.note)}</em>`:""}</div></div>`;
+  });
+  h+=`</div></div><div class="citation"><p>${esc(c.citation||"")}</p></div>`;
+  return h;
+}
+
+/* ---------- vue prépa ---------- */
+function vuePrep(){
+  const perso=jget("check_perso",{});
+  const g=DATA.checklistGroupe||[], p=DATA.checklistPerso||[];
+  const fg=g.filter(x=>x.fait).length, fp=p.filter(x=>perso[x.item]).length;
+  const cd=dodos();
+  let h="";
+  if(cd) h+=`<div class="sect" style="padding-top:20px"><div class="card" style="text-align:center">
+    <div class="quand">départ</div>
+    <div style="font-family:var(--display);font-size:42px;color:var(--ochre);line-height:1.1">${cd}</div>
+    <div class="sous" style="font-family:var(--hand);font-size:18px;color:var(--teal)">dodo${cd>1?"s":""} avant l'Italie</div></div></div>`;
+
+  h+=`<div class="sect"><h3>Le groupe <span class="cpt">${fg}/${g.length}</span></h3><div class="card">`;
+  if(!g.length) h+=`<p class="empty">Aucun item.</p>`;
+  let cat=null;
+  g.forEach(it=>{
+    if(it.categorie!==cat){ cat=it.categorie; h+=`<div class="cat">${esc(cat)}</div>`; }
+    h+=`<button class="check grp${it.fait?" done":""}" data-item="${esc(it.item)}" data-fait="${it.fait?1:0}">
+      <span class="boite">${OK}</span><span class="lbl">${esc(it.item)}
+      ${(it.responsable||it.echeance)?`<span class="qui">${esc(it.responsable||"")}${it.echeance?(it.responsable?" · ":"")+esc(it.echeance):""}</span>`:""}
+      </span></button>`;
+  });
+  h+=`</div><p class="aide">Ces cases sont partagées : ce que tu coches, tout le groupe le voit.</p></div>`;
+
+  h+=`<div class="sect"><h3>Ma valise <span class="cpt">${fp}/${p.length}</span></h3><div class="card">`;
+  cat=null;
+  p.forEach(it=>{
+    if(it.categorie!==cat){ cat=it.categorie; h+=`<div class="cat">${esc(cat)}</div>`; }
+    h+=`<button class="check perso${perso[it.item]?" done":""}" data-perso="${esc(it.item)}">
+      <span class="boite">${OK}</span><span class="lbl">${esc(it.item)}</span></button>`;
+  });
+  h+=`</div><p class="aide">Cette liste reste sur ton appareil. Personne d'autre ne la voit.</p></div>`;
+  return h;
+}
+
+/* ---------- écrans superposés ---------- */
+const INTRO=`
+<p>Cette app rassemble l'itinéraire préparé par Vero. Elle tient dans ton téléphone et
+<strong>fonctionne sans réseau</strong> une fois ouverte.</p>
+<p>Le contenu vit dans un fichier partagé. Quand quelqu'un le modifie, ça se met à jour
+tout seul chez tout le monde.</p>
+<p>Ce qui porte une <strong>heure en ocre</strong> ne se déplace pas : train acheté, auto
+réservée, bateau, vol. Le reste est souple.</p>
+<p>Les blocs de <strong>propositions</strong> se tranchent sur place. Ton choix s'écrit avec
+ton nom, reste visible, et s'annule quand tu veux.</p>
+<p>Les cases de l'écran Prépa sont partagées, sauf <strong>Ma valise</strong>, qui reste sur
+ton appareil.</p>`;
+
+function feuille(quoi){
+  const v=el('<div class="voile"></div>');
+  let corps="";
+  if(quoi==="intro") corps=`<div class="sect intro" style="padding-top:16px">${INTRO}</div>`;
+  else corps=`<div class="sect" style="padding-top:16px">
+    <input class="champ" id="sid" placeholder="Identifiant du Google Sheet" value="${esc(SHEET_ID)}"
+      autocapitalize="off" autocorrect="off" spellcheck="false">
+    <p class="aide">Dans l'adresse du Sheet, entre /d/ et /edit.</p>
+    <input class="champ" id="surl" placeholder="Adresse de la passerelle d'écriture" value="${esc(SCRIPT_URL)}"
+      autocapitalize="off" autocorrect="off" spellcheck="false">
+    <p class="aide">Déploiement Apps Script. Sans elle, l'app lit mais n'écrit pas.</p>
+    <input class="champ" id="moi" placeholder="Ton prénom" value="${esc(MOI)}">
+    <p class="aide">Sert à signer tes décisions et tes notes.</p>
+    <button class="big" data-feuille="intro"><span>Comment ça marche</span><span class="m">Lire ›</span></button>
+    </div>`;
+  v.innerHTML=`<div class="feuille"><header><h2>${quoi==="intro"?"Comment ça marche":"Réglages"}</h2>
+    <button class="x">Fermer</button></header>${corps}</div>`;
+  v.onclick=e=>{ if(e.target===v||e.target.classList.contains("x")){ v.remove(); rendre(); } };
+  document.body.appendChild(v);
+  const sid=v.querySelector("#sid"), su=v.querySelector("#surl"), mo=v.querySelector("#moi");
+  if(sid) sid.onchange=()=>{ const m=sid.value.trim().match(/\/d\/([a-zA-Z0-9-_]+)/);
+    SHEET_ID=m?m[1]:sid.value.trim(); store.set("sheet_id",SHEET_ID); sync(); };
+  if(su) su.onchange=()=>{ SCRIPT_URL=su.value.trim(); store.set("script_url",SCRIPT_URL);
+    toast(SCRIPT_URL?"Passerelle branchée":"Passerelle retirée"); };
+  if(mo) mo.onchange=()=>{ MOI=mo.value.trim(); store.set("moi",MOI); };
+  const bi=v.querySelector("[data-feuille=intro]");
+  if(bi&&quoi!=="intro") bi.onclick=()=>{ v.remove(); feuille("intro"); };
+}
+
+/* ---------- rendu ---------- */
+function rendre(){
+  rendreNav();
+  const v=document.getElementById("vue");
+  v.innerHTML = etat.tab==="jour"? vueJour() : etat.tab==="infos"? vueInfos() : vuePrep();
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===etat.tab));
+  document.getElementById("navjours").style.display = etat.tab==="jour"?"":"none";
+
+  v.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>aller(+b.dataset.nav));
+  v.querySelectorAll("[data-go=vols]").forEach(b=>b.onclick=()=>{ etat.tab="infos"; rendre();
+    setTimeout(()=>{ const t=document.getElementById("vols"); if(t) t.scrollIntoView({block:"start"}); },60); });
+  v.querySelectorAll("[data-feuille]").forEach(b=>b.onclick=()=>feuille(b.dataset.feuille));
+  v.querySelectorAll("[data-copie]").forEach(b=>b.onclick=async()=>{
+    try{ await navigator.clipboard.writeText(b.dataset.copie); toast("Adresse copiée"); }
+    catch(e){ toast("Copie impossible sur cet appareil"); } });
+  v.querySelectorAll("[data-opt]").forEach(b=>b.onclick=()=>{
+    const o=(DATA.options||[]).find(x=>x.id===b.dataset.opt);
+    if(o){ o.choix=b.dataset.val; o.par=MOI||o.par; }
+    jset("cache_data",DATA); rendre();
+    envoyer({action:"option",id:b.dataset.opt,choix:b.dataset.val},
+      b.dataset.val==="NON"?"Écarté":b.dataset.val?"Retenu":"Remis au menu"); });
+  v.querySelectorAll(".check.grp").forEach(b=>b.onclick=()=>{
+    const it=(DATA.checklistGroupe||[]).find(x=>x.item===b.dataset.item);
+    const n=b.dataset.fait!=="1"; if(it) it.fait=n;
+    jset("cache_data",DATA); rendre();
+    envoyer({action:"check",item:b.dataset.item,fait:n},"Mis à jour"); });
+  v.querySelectorAll(".check.perso").forEach(b=>b.onclick=()=>{
+    const m=jget("check_perso",{}); m[b.dataset.perso]=!m[b.dataset.perso];
+    jset("check_perso",m); rendre(); });
+  const env=v.querySelector("#envMsg");
+  if(env) env.onclick=()=>{ const t=v.querySelector("#msg");
+    if(!t.value.trim()) return;
+    envoyer({action:"note",jour:etat.jour,message:t.value.trim()},"Note ajoutée"); t.value=""; };
+  window.scrollTo({top:0});
+}
+
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{ etat.tab=t.dataset.tab; rendre(); });
+document.getElementById("sync").onclick=()=>feuille("reglages");
+
+/* ---------- gestes et clavier ---------- */
+let x0=null,y0=null;
+document.addEventListener("touchstart",e=>{ x0=e.touches[0].clientX; y0=e.touches[0].clientY; },{passive:true});
+document.addEventListener("touchend",e=>{
+  if(x0===null||etat.tab!=="jour"||document.querySelector(".voile")) return;
+  const dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0;
+  if(Math.abs(dx)>62 && Math.abs(dx)>Math.abs(dy)*1.8) aller(etat.jour+(dx<0?1:-1));
+  x0=null;
+},{passive:true});
+document.addEventListener("keydown",e=>{
+  if(etat.tab!=="jour"||/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if(e.key==="ArrowLeft") aller(etat.jour-1);
+  if(e.key==="ArrowRight") aller(etat.jour+1);
+});
+
+/* ---------- démarrage ---------- */
+etat.jour = aujourdhui() || 1;
+rendre();
+setSync(store.get("cache_ts")?"ok":"", SHEET_ID?"Mise à jour…":"Contenu local");
+sync();
+if(!store.get("vu_intro")){ store.set("vu_intro","1"); setTimeout(()=>feuille("intro"),400); }
+window.addEventListener("online",sync);
+if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js"); }catch(e){} }
+</script>
+</body>
+</html>

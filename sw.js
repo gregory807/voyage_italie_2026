@@ -2,6 +2,14 @@
 const CACHE = "italie-v1";
 const FICHIERS = ["./", "./index.html", "./manifest.json",
   "./couverture.webp",
+  "./extra-amalfi.webp",
+  "./extra-bolsena.webp",
+  "./extra-carte-milan.webp",
+  "./extra-monterosso.webp",
+  "./extra-navigli.webp",
+  "./extra-regina-giovanna.webp",
+  "./extra-toscane-village.webp",
+  "./extra-varenna-plage.webp",
   "./jour-01.webp",
   "./jour-02.webp",
   "./jour-03.webp",
@@ -14,7 +22,13 @@ const FICHIERS = ["./", "./index.html", "./manifest.json",
   "./jour-10.webp",
   "./jour-11.webp",
   "./jour-12.webp",
-  "./jour-13.webp"];
+  "./jour-13.webp",
+  "./opt-bellagio.webp",
+  "./opt-capri.webp",
+  "./opt-sangimignano.webp",
+  "./opt-sienne.webp",
+  "./opt-sorrento.webp",
+  "./opt-valdorcia.webp"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FICHIERS)).then(() => self.skipWaiting()));
 });
